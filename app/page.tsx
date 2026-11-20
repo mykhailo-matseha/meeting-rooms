@@ -1,69 +1,132 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { MeetingRoom } from "@/types/room";
+import {
+  subscribeRooms,
+  createRoom,
+  updateRoom,
+  deleteRoom,
+} from "@/services/rooms";
+import Heading from "@/components/ui/Heading";
+import Button from "@/components/ui/Button";
+import RoomCard from "@/components/rooms/RoomCard";
+import RoomModal from "@/components/rooms/RoomModal";
+
+export default function HomePage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  const [rooms, setRooms] = useState<MeetingRoom[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRoom, setEditingRoom] = useState<MeetingRoom | null>(null);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [user, loading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    const unsubscribe = subscribeRooms((data) => {
+      setRooms(data);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const handleModalSubmit = async (name: string, description: string) => {
+    if (editingRoom) {
+      await updateRoom(editingRoom.id, name, description);
+    } else {
+      await createRoom(name, description, user.email || "unknown");
+    }
+    setEditingRoom(null);
+  };
+
+  const handleEditClick = (room: MeetingRoom) => {
+    setEditingRoom(room);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = async (roomId: string) => {
+    if (window.confirm("Are you sure you want to delete this room?")) {
+      await deleteRoom(roomId);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      <div className="max-w-6xl mx-auto w-full px-4 py-8 flex-1 flex flex-col gap-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <Heading as="h1" size="lg" className="text-foreground">
+            Meeting Rooms
+          </Heading>
+          <Button
+            onClick={() => {
+              setEditingRoom(null);
+              setIsModalOpen(true);
+            }}
+            className="bg-accent hover:bg-accent-hover text-white flex items-center gap-2 self-start sm:self-auto"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Plus className="w-4 h-4" />
+            <span>Create Room</span>
+          </Button>
         </div>
-      </main>
-    </div>
+
+        {rooms.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 bg-surface/50 border border-border border-dashed rounded-2xl text-center gap-3">
+            <Heading as="h3" size="sm" className="text-foreground">
+              No meeting rooms yet
+            </Heading>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rooms.map((room) => {
+              const userEmail = user.email?.toLowerCase();
+              const isAdmin =
+                room.createdBy === userEmail ||
+                room.members?.some(
+                  (m) => m.email === userEmail && m.role === "admin",
+                );
+
+              return (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  isAdmin={Boolean(isAdmin)}
+                  onEdit={() => handleEditClick(room)}
+                  onDelete={() => handleDeleteClick(room.id)}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <RoomModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingRoom(null);
+        }}
+        onSubmit={handleModalSubmit}
+        initialData={
+          editingRoom
+            ? { name: editingRoom.name, description: editingRoom.description }
+            : null
+        }
+      />
+    </>
   );
 }
