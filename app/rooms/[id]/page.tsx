@@ -36,6 +36,19 @@ function RoomContent({ params }: RoomPageProps) {
     new Date().toISOString().slice(0, 10),
   );
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
+  const currentUserEmail = user?.email?.toLowerCase();
+  const currentMember = room?.members?.find(
+    (m) => m.email === currentUserEmail,
+  );
+  const isCreator = room?.createdBy === currentUserEmail;
+  const isAdmin = isCreator || currentMember?.role === "admin";
+  const isMember = isCreator || Boolean(currentMember);
+  useEffect(() => {
+    if (room && !isMember) {
+      router.replace("/");
+    }
+  }, [room, isMember, router]);
+
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
@@ -58,13 +71,6 @@ function RoomContent({ params }: RoomPageProps) {
     return () => unsubscribe();
   }, [id]);
 
-  if (loading || !user || !room) {
-    return (
-      <div className="grow flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
   const handleJoinLeave = async (booking: Booking) => {
     if (!currentUserEmail) return;
     try {
@@ -87,10 +93,31 @@ function RoomContent({ params }: RoomPageProps) {
     }
   };
 
-  const currentUserEmail = user.email?.toLowerCase();
-  const currentMember = room.members?.find((m) => m.email === currentUserEmail);
-  const isAdmin =
-    room.createdBy === currentUserEmail || currentMember?.role === "admin";
+  if (loading || !user || !room) {
+    return (
+      <div className="grow flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+  if (!isMember) {
+    return (
+      <div className="grow flex items-center justify-center bg-background px-4">
+        <div className="bg-surface border border-border rounded-2xl p-8 max-w-md w-full flex flex-col items-center text-center gap-4">
+          <h2 className="text-lg font-bold text-foreground">Access Denied</h2>
+          <p className="text-sm text-muted">
+            You are not a member of this room or your access has been revoked.
+          </p>
+          <Link
+            href="/"
+            className="mt-2 py-2 px-5 bg-accent hover:bg-accent-hover text-white text-sm font-semibold rounded-2xl transition-colors"
+          >
+            Back to Rooms
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto w-full px-4 py-8 flex-1 flex flex-col gap-8">
