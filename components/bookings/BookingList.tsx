@@ -42,7 +42,7 @@ export default function BookingList({
           </Heading>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex  gap-3 flex-col sm:flex-row sm:items-center">
           <Input
             type="date"
             value={selectedDate}
