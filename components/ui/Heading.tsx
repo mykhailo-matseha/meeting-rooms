@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Size } from "@/types/sizes";
 
 type HeadingLevel = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -7,7 +6,7 @@ interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
   as?: HeadingLevel;
   children: React.ReactNode;
   className?: string;
-  size?: Size;
+  size?: "sm" | "md" | "lg";
 }
 
 function Heading({
