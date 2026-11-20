@@ -11,6 +11,14 @@ import Badge from "@/components/ui/Badge";
 import { subscribeRoom } from "@/services/rooms";
 import MemberList from "@/components/rooms/MembersList";
 import AddMemberForm from "@/components/rooms/AddMemberForm";
+import BookingList from "@/components/bookings/BookingList";
+import { Booking } from "@/types";
+import BookingModal from "@/components/bookings/BookingModal";
+import {
+  deleteBooking,
+  subscribeRoomBookings,
+  toggleJoinBooking,
+} from "@/services/bookings";
 
 interface RoomPageProps {
   params: Promise<{ id: string }>;
@@ -21,7 +29,11 @@ function RoomContent({ params }: RoomPageProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [room, setRoom] = useState<MeetingRoom | null>(null);
-
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
@@ -36,6 +48,14 @@ function RoomContent({ params }: RoomPageProps) {
     return () => unsubscribe();
   }, [id]);
 
+  useEffect(() => {
+    if (!id) return;
+    const unsubscribe = subscribeRoomBookings(id, (data) => {
+      setBookings(data);
+    });
+    return () => unsubscribe();
+  }, [id]);
+
   if (loading || !user || !room) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -43,6 +63,27 @@ function RoomContent({ params }: RoomPageProps) {
       </div>
     );
   }
+  const handleJoinLeave = async (booking: Booking) => {
+    if (!currentUserEmail) return;
+    try {
+      await toggleJoinBooking(
+        booking.id,
+        booking.participants || [],
+        currentUserEmail,
+      );
+    } catch (err) {
+      console.error("Failed to toggle join/leave", err);
+    }
+  };
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (confirm("Are you sure you want to cancel this meeting?")) {
+      try {
+        await deleteBooking(bookingId);
+      } catch (err) {
+        console.error("Failed to delete booking", err);
+      }
+    }
+  };
 
   const currentUserEmail = user.email?.toLowerCase();
   const currentMember = room.members?.find((m) => m.email === currentUserEmail);
@@ -77,6 +118,16 @@ function RoomContent({ params }: RoomPageProps) {
           </div>
         </div>
       </div>
+      <BookingList
+        bookings={bookings}
+        currentUserEmail={currentUserEmail}
+        isAdmin={isAdmin}
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
+        onOpenBookModal={() => setIsBookModalOpen(true)}
+        onJoinLeave={handleJoinLeave}
+        onDeleteBooking={handleDeleteBooking}
+      />
       <div className="grid grid-cols-2 gap-5">
         <MemberList
           roomId={room.id}
@@ -86,6 +137,12 @@ function RoomContent({ params }: RoomPageProps) {
         />
         {isAdmin && <AddMemberForm roomId={room.id} />}
       </div>
+      <BookingModal
+        isOpen={isBookModalOpen}
+        onClose={() => setIsBookModalOpen(false)}
+        roomId={room.id}
+        defaultDate={selectedDate}
+      />
     </div>
   );
 }
