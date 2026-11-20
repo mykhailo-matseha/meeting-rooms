@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { Suspense, use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -15,7 +15,7 @@ interface RoomPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function RoomPage({ params }: RoomPageProps) {
+function RoomContent({ params }: RoomPageProps) {
   const { id } = use(params);
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -78,5 +78,19 @@ export default function RoomPage({ params }: RoomPageProps) {
       </div>
       <MemberList members={room.members} currentUserEmail={currentUserEmail} />
     </div>
+  );
+}
+
+export default function RoomPage(props: RoomPageProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <RoomContent {...props} />
+    </Suspense>
   );
 }
