@@ -6,6 +6,7 @@ import Field from "@/components/ui/Field";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { roomSchema } from "@/lib/schemas";
+import Alert from "../ui/Alert";
 
 interface RoomModalProps {
   isOpen: boolean;
@@ -50,11 +51,7 @@ export default function RoomModal({
       title={initialData ? "Edit Meeting Room" : "Create Meeting Room"}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {error && (
-          <div className="bg-danger/10 border border-danger/30 text-danger text-sm rounded-xl p-3 text-center">
-            {error}
-          </div>
-        )}
+        {error && <Alert>{error}</Alert>}
 
         <Field label="Room Name">
           <Input

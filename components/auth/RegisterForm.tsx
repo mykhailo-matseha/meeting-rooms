@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
 import { getFirebaseErrorMessage } from "@/lib/firebaseErrors";
 import { registerSchema } from "@/lib/schemas";
+import Alert from "../ui/Alert";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -51,11 +52,7 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && (
-        <div className="bg-danger/10 border border-danger/30 text-danger text-sm rounded-xl p-3 text-center">
-          {error}
-        </div>
-      )}
+      {error && <Alert>{error}</Alert>}
       <Field label="Full Name">
         <Input
           value={name}
