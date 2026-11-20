@@ -16,13 +16,19 @@ export default function RegisterForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setError("");
-    const validation = registerSchema.safeParse({ name, email, password });
+    const validation = registerSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
     if (!validation.success) {
       const firstErrorMessage = validation.error.issues[0]?.message;
       setError(firstErrorMessage);
@@ -72,6 +78,15 @@ export default function RegisterForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          placeholder="CM2/£*D5lja3"
+          required
+        />
+      </Field>
+      <Field label="Confirm Password">
+        <Input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="CM2/£*D5lja3"
           required
         />
