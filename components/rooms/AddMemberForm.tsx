@@ -57,7 +57,7 @@ export default function AddMemberForm({ roomId }: AddMemberFormProps) {
         </Heading>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
         {error && <Alert>{error}</Alert>}
 
         <Field label="User Email">

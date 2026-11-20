@@ -50,7 +50,7 @@ export default function RoomModal({
       onClose={onClose}
       title={initialData ? "Edit Meeting Room" : "Create Meeting Room"}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
         {error && <Alert>{error}</Alert>}
 
         <Field label="Room Name">
