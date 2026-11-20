@@ -27,7 +27,7 @@ export default function AuthCard({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="grow flex items-center justify-center p-4">
         <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -37,7 +37,7 @@ export default function AuthCard({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="grow flex items-center justify-center p-4">
       <div className="bg-surface border border-border rounded-2xl p-8 max-w-md w-full shadow-xl flex flex-col gap-6">
         <div className="text-center">
           <Heading as="h1" size="lg" className="text-foreground">
