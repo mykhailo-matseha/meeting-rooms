@@ -35,6 +35,34 @@ export function subscribeRoomBookings(
   });
 }
 
+export async function updateBooking(
+  bookingId: string,
+  input: CreateBookingInput,
+) {
+  if (input.endTime <= input.startTime) {
+    throw new Error("End time must be after start time");
+  }
+  const hasConflict = await checkBookingConflict(
+    input.roomId,
+    input.date,
+    input.startTime,
+    input.endTime,
+    bookingId,
+  );
+  if (hasConflict) {
+    throw new Error(
+      "This time slot is already booked. Please choose a different time.",
+    );
+  }
+  const bookingRef = doc(db, COLLECTION_NAME, bookingId);
+  return await updateDoc(bookingRef, {
+    title: input.title.trim(),
+    date: input.date,
+    startTime: input.startTime,
+    endTime: input.endTime,
+  });
+}
+
 export async function checkBookingConflict(
   roomId: string,
   date: string,

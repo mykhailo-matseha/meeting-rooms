@@ -16,6 +16,7 @@ interface BookingListProps {
   onOpenBookModal: () => void;
   onJoinLeave: (booking: Booking) => void;
   onDeleteBooking: (bookingId: string) => void;
+  onEditBooking: (booking: Booking) => void;
 }
 
 export default function BookingList({
@@ -27,6 +28,7 @@ export default function BookingList({
   onOpenBookModal,
   onJoinLeave,
   onDeleteBooking,
+  onEditBooking,
 }: BookingListProps) {
   const dayBookings = bookings.filter((b) => b.date === selectedDate);
 
@@ -73,6 +75,7 @@ export default function BookingList({
               isAdmin={isAdmin}
               onJoinLeave={onJoinLeave}
               onDelete={onDeleteBooking}
+              onEdit={onEditBooking}
             />
           ))}
         </div>

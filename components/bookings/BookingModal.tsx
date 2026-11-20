@@ -8,13 +8,15 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import { bookingSchema } from "@/lib/schemas";
-import { createBooking } from "@/services/bookings";
+import { createBooking, updateBooking } from "@/services/bookings";
+import { Booking } from "@/types";
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   roomId: string;
   defaultDate?: string;
+  initialData?: Booking | null;
 }
 
 export default function BookingModal({
@@ -22,15 +24,14 @@ export default function BookingModal({
   onClose,
   roomId,
   defaultDate,
+  initialData,
 }: BookingModalProps) {
   const { user } = useAuth();
-
   const today = defaultDate || new Date().toISOString().slice(0, 10);
-
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState(today);
-  const [startTime, setStartTime] = useState("10:00");
-  const [endTime, setEndTime] = useState("11:00");
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [date, setDate] = useState(initialData?.date || today);
+  const [startTime, setStartTime] = useState(initialData?.startTime || "10:00");
+  const [endTime, setEndTime] = useState(initialData?.endTime || "11:00");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -56,18 +57,27 @@ export default function BookingModal({
 
     try {
       setIsLoading(true);
-      await createBooking(
-        {
+      if (initialData) {
+        await updateBooking(initialData.id, {
           roomId,
           title: validation.data.title,
           date: validation.data.date,
           startTime: validation.data.startTime,
           endTime: validation.data.endTime,
-        },
-        user.email,
-        user.displayName || user.email.split("@")[0],
-      );
-      setTitle("");
+        });
+      } else {
+        await createBooking(
+          {
+            roomId,
+            title: validation.data.title,
+            date: validation.data.date,
+            startTime: validation.data.startTime,
+            endTime: validation.data.endTime,
+          },
+          user.email,
+          user.displayName || user.email.split("@")[0],
+        );
+      }
       onClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -131,7 +141,11 @@ export default function BookingModal({
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading} size="md">
-            {isLoading ? "Checking & Booking..." : "Book Room"}
+            {isLoading
+              ? "Saving..."
+              : initialData
+                ? "Save Changes"
+                : "Book Room"}
           </Button>
         </div>
       </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2, Users } from "lucide-react";
+import { Pencil, Trash2, Users } from "lucide-react";
 import { Booking } from "@/types/booking";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -9,6 +9,7 @@ interface BookingCardProps {
   booking: Booking;
   currentUserEmail?: string;
   isAdmin: boolean;
+  onEdit: (booking: Booking) => void;
   onJoinLeave: (booking: Booking) => void;
   onDelete: (bookingId: string) => void;
 }
@@ -19,10 +20,11 @@ export default function BookingCard({
   isAdmin,
   onJoinLeave,
   onDelete,
+  onEdit,
 }: BookingCardProps) {
   const isParticipant =
     currentUserEmail && booking.participants?.includes(currentUserEmail);
-  const canDelete = isAdmin || booking.createdBy === currentUserEmail;
+  const canManage = isAdmin || booking.createdBy === currentUserEmail;
 
   return (
     <div className="p-4 rounded-xl border border-border bg-surface-hover flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -63,15 +65,25 @@ export default function BookingCard({
           {isParticipant ? "Leave Meeting" : "Join"}
         </Button>
 
-        {canDelete && (
-          <button
-            type="button"
-            onClick={() => onDelete(booking.id)}
-            className="p-2 text-muted hover:text-danger rounded-lg transition-colors cursor-pointer"
-            title="Cancel meeting"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+        {canManage && (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => onEdit(booking)}
+              className="p-2 text-muted hover:text-foreground rounded-lg transition-colors cursor-pointer"
+              title="Edit meeting"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(booking.id)}
+              className="p-2 text-muted hover:text-danger rounded-lg transition-colors cursor-pointer"
+              title="Cancel meeting"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
         )}
       </div>
     </div>

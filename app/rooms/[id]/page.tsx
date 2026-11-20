@@ -34,6 +34,7 @@ function RoomContent({ params }: RoomPageProps) {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().slice(0, 10),
   );
+  const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
@@ -124,9 +125,16 @@ function RoomContent({ params }: RoomPageProps) {
         isAdmin={isAdmin}
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
-        onOpenBookModal={() => setIsBookModalOpen(true)}
+        onOpenBookModal={() => {
+          setEditingBooking(null);
+          setIsBookModalOpen(true);
+        }}
         onJoinLeave={handleJoinLeave}
         onDeleteBooking={handleDeleteBooking}
+        onEditBooking={(booking) => {
+          setEditingBooking(booking);
+          setIsBookModalOpen(true);
+        }}
       />
       <div className="grid grid-cols-2 gap-5">
         <MemberList
@@ -138,10 +146,12 @@ function RoomContent({ params }: RoomPageProps) {
         {isAdmin && <AddMemberForm roomId={room.id} />}
       </div>
       <BookingModal
+        key={editingBooking ? editingBooking.id : "new-booking"}
         isOpen={isBookModalOpen}
         onClose={() => setIsBookModalOpen(false)}
         roomId={room.id}
         defaultDate={selectedDate}
+        initialData={editingBooking}
       />
     </div>
   );
