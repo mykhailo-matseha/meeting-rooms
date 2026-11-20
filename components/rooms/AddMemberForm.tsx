@@ -37,8 +37,12 @@ export default function AddMemberForm({ roomId }: AddMemberFormProps) {
       await addRoomMember(roomId, validation.data.email, role);
       setEmail("");
       setRole("user");
-    } catch {
-      setError("Failed to add member");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to add member");
+      }
     } finally {
       setIsLoading(false);
     }

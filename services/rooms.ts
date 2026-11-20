@@ -8,6 +8,8 @@ import {
   query,
   orderBy,
   runTransaction,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import { MeetingRoom } from "@/types/room";
 import { db } from "@/lib/firebase";
@@ -90,6 +92,13 @@ export async function addRoomMember(
 ) {
   const roomRef = doc(db, COLLECTION_NAME, roomId);
   const email = memberEmail.trim().toLowerCase();
+
+  const userQuery = query(collection(db, "users"), where("email", "==", email));
+  const userSnap = await getDocs(userQuery);
+  if (userSnap.empty) {
+    throw new Error("User with this email not found");
+  }
+
   await runTransaction(db, async (transaction) => {
     const roomData = await transaction.get(roomRef);
     if (!roomData.exists()) {
