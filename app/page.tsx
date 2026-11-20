@@ -23,7 +23,13 @@ export default function HomePage() {
   const [rooms, setRooms] = useState<MeetingRoom[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<MeetingRoom | null>(null);
+  const currentUserEmail = user?.email?.toLowerCase();
 
+  const visibleRooms = rooms.filter(
+    (room) =>
+      room.createdBy === currentUserEmail ||
+      room.members?.some((m) => m.email.toLowerCase() === currentUserEmail),
+  );
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
@@ -85,7 +91,7 @@ export default function HomePage() {
           </Button>
         </div>
 
-        {rooms.length === 0 ? (
+        {visibleRooms.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 bg-surface/50 border border-border border-dashed rounded-2xl text-center gap-3">
             <Heading as="h3" size="sm" className="text-foreground">
               No meeting rooms yet
@@ -93,7 +99,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms.map((room) => {
+            {visibleRooms.map((room) => {
               const userEmail = user.email?.toLowerCase();
               const isAdmin =
                 room.createdBy === userEmail ||
