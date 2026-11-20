@@ -63,3 +63,20 @@ export async function deleteRoom(roomId: string) {
   const roomRef = doc(db, COLLECTION_NAME, roomId);
   return await deleteDoc(roomRef);
 }
+
+export function subscribeRoom(
+  roomId: string,
+  callback: (room: MeetingRoom | null) => void,
+) {
+  const roomRef = doc(db, COLLECTION_NAME, roomId);
+  return onSnapshot(roomRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback({
+        id: docSnap.id,
+        ...(docSnap.data() as Omit<MeetingRoom, "id">),
+      });
+    } else {
+      callback(null);
+    }
+  });
+}
