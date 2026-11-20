@@ -79,6 +79,8 @@ function RoomContent({ params }: RoomPageProps) {
       </div>
       <div className="grid grid-cols-2 gap-5">
         <MemberList
+          roomId={room.id}
+          isAdmin={isAdmin}
           members={room.members}
           currentUserEmail={currentUserEmail}
         />

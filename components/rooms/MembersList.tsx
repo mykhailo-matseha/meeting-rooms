@@ -1,16 +1,22 @@
 "use client";
 
-import { Users } from "lucide-react";
+import { Trash, Users } from "lucide-react";
 import { RoomMember } from "@/types/user";
 import Heading from "@/components/ui/Heading";
-import Badge from "@/components/ui/Badge";
+import Button from "../ui/Button";
+import { removeRoomMember } from "@/services/rooms";
+import Badge from "../ui/Badge";
 
 interface MemberListProps {
+  roomId: string;
   members: RoomMember[];
   currentUserEmail?: string;
+  isAdmin: boolean;
 }
 
 export default function MemberList({
+  roomId,
+  isAdmin,
   members,
   currentUserEmail,
 }: MemberListProps) {
@@ -36,21 +42,29 @@ export default function MemberList({
                   {member.email.charAt(0)}
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-foreground">
+                  <div className="font-medium text-foreground">
                     {member.email}
-                    {isCurrentUser && " (You)"}
+                    {isCurrentUser && <span className="font-bold"> (You)</span>}
                   </div>
-                  <div className="text-xs text-muted capitalize">
-                    Role: {member.role}
-                  </div>
+                  <Badge size="sm">
+                    {member.role === "admin" ? "Admin" : "User"}
+                  </Badge>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Badge size="sm">
-                  {member.role === "admin" ? "Admin" : "User"}
-                </Badge>
-              </div>
+              {isAdmin && member.email !== currentUserEmail && (
+                <Button
+                  onClick={async () => {
+                    if (confirm(`Remove ${member.email} from this room?`)) {
+                      await removeRoomMember(roomId, member.email);
+                    }
+                  }}
+                  isIcon
+                  className="bg-danger hover:bg-accent-hover"
+                >
+                  <Trash />
+                </Button>
+              )}
             </div>
           );
         })}
