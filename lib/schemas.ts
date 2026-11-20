@@ -21,3 +21,7 @@ export const roomSchema = z.object({
   name: z.string().trim().min(3, "Room name must be at least 3 characters"),
   description: z.string().trim().optional().default(""),
 });
+
+export const addMemberSchema = z.object({
+  email: z.email("Please enter a valid email address").trim(),
+});

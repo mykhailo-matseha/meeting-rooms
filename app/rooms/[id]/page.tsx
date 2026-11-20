@@ -10,6 +10,7 @@ import Heading from "@/components/ui/Heading";
 import Badge from "@/components/ui/Badge";
 import { subscribeRoom } from "@/services/rooms";
 import MemberList from "@/components/rooms/MembersList";
+import AddMemberForm from "@/components/rooms/AddMemberForm";
 
 interface RoomPageProps {
   params: Promise<{ id: string }>;
@@ -76,7 +77,13 @@ function RoomContent({ params }: RoomPageProps) {
           </div>
         </div>
       </div>
-      <MemberList members={room.members} currentUserEmail={currentUserEmail} />
+      <div className="grid grid-cols-2 gap-5">
+        <MemberList
+          members={room.members}
+          currentUserEmail={currentUserEmail}
+        />
+        {isAdmin && <AddMemberForm roomId={room.id} />}
+      </div>
     </div>
   );
 }
