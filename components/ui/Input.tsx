@@ -15,7 +15,7 @@ export default function Input({ icon, className, ...props }: InputProps) {
       )}
       <input
         className={cn(
-          "w-full bg-surface border border-border rounded-xl py-2 px-3.5 text-sm text-foreground placeholder:text-muted outline-none transition-all",
+          "w-full h-10 bg-surface border border-border rounded-xl py-2 px-3.5 text-sm text-foreground placeholder:text-muted outline-none transition-all",
           "focus:border-accent focus:ring-2 focus:ring-accent/20",
           icon && "pl-10",
           className,
