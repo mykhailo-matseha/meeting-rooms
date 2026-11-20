@@ -19,6 +19,7 @@ import {
   subscribeRoomBookings,
   toggleJoinBooking,
 } from "@/services/bookings";
+import { cn } from "@/lib/utils";
 
 interface RoomPageProps {
   params: Promise<{ id: string }>;
@@ -136,7 +137,9 @@ function RoomContent({ params }: RoomPageProps) {
           setIsBookModalOpen(true);
         }}
       />
-      <div className="grid grid-cols-2 gap-5">
+      <div
+        className={cn("grid gap-5", isAdmin && "sm:grid-cols-2 grid-cols-1")}
+      >
         <MemberList
           roomId={room.id}
           isAdmin={isAdmin}
