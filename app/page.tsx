@@ -46,7 +46,7 @@ export default function HomePage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="grow flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -121,6 +121,7 @@ export default function HomePage() {
         )}
       </div>
       <RoomModal
+        key={editingRoom ? editingRoom.id : "new-room"}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);

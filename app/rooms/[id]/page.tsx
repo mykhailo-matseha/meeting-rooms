@@ -60,7 +60,7 @@ function RoomContent({ params }: RoomPageProps) {
 
   if (loading || !user || !room) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="grow flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -151,7 +151,10 @@ function RoomContent({ params }: RoomPageProps) {
       <BookingModal
         key={editingBooking ? editingBooking.id : "new-booking"}
         isOpen={isBookModalOpen}
-        onClose={() => setIsBookModalOpen(false)}
+        onClose={() => {
+          setIsBookModalOpen(false);
+          setEditingBooking(null);
+        }}
         roomId={room.id}
         defaultDate={selectedDate}
         initialData={editingBooking}
@@ -164,7 +167,7 @@ export default function RoomPage(props: RoomPageProps) {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="grow flex items-center justify-center bg-background">
           <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
       }
