@@ -14,7 +14,7 @@ export default function LoginPage() {
             href="/register"
             className="text-accent hover:underline font-medium"
           >
-            Sign In
+            Make one!
           </Link>
         </p>
       }

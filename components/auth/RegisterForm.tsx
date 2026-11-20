@@ -94,7 +94,7 @@ export default function RegisterForm() {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-accent hover:bg-accent-hover text-white py-3 mt-2"
+        className="w-full text-white py-3 mt-2"
       >
         {isLoading ? "Creating account..." : "Sign Up"}
       </Button>

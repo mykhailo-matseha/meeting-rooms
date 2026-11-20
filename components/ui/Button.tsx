@@ -32,7 +32,7 @@ function Button({
   ...props
 }: ButtonProps) {
   const finalClasses = cn(
-    `inline-flex items-center justify-center text-center rounded-2xl font-semibold cursor-pointer transition-colors`,
+    `inline-flex items-center justify-center text-center bg-accent text-white hover:bg-accent-hover rounded-2xl font-semibold cursor-pointer transition-colors`,
     size === "sm" && `text-xs py-1 px-3`,
     size === "md" && `text-base py-2 px-4`,
     size === "lg" && `text-lg py-3 px-5`,

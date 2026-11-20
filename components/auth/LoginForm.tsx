@@ -65,7 +65,7 @@ export default function LoginForm() {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full bg-accent hover:bg-accent-hover text-white py-3 mt-2"
+        className="w-full text-white py-3 mt-2"
       >
         {isLoading ? "Logging in..." : "Log In"}
       </Button>
